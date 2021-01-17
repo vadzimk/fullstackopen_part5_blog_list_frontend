@@ -14,13 +14,8 @@ const getAll = () => {
 }
 
 const createBlog = async (blog) => {
-    try {
         const res = await axios.post(baseUrl, blog, {headers: {Authorization: token}})
         return res.data
-    } catch (e){
-        console.log('Error', e)
-
-    }
 }
 
 const blogService = {getAll, createBlog, setToken}

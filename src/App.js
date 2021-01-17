@@ -4,6 +4,7 @@ import LoginForm from "./components/LoginForm.js";
 import blogService from './services/blogs'
 import loginService from "./services/login.js";
 import BlogForm from "./components/BlogForm.js";
+import Notification from "./components/Notification.js";
 
 const App = () => {
     const [blogs, setBlogs] = useState([])
@@ -11,6 +12,17 @@ const App = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [newBlog, setNewBlog] = useState({title: '', author: '', url: ''})
+    const [notification, setNotification] = useState({message: '', isError: false})
+
+    /**
+     * @param message is error if error is true, else just message
+     * @param isError is true if notifies about error
+     * */
+    const notify = (message, isError=false)=>{
+        console.log(message)
+        setNotification({message, isError})
+        setTimeout(()=>setNotification({message: '', isError: false}), 5000)
+    }
 
     useEffect(() => {
         blogService.getAll().then(blogs =>
@@ -26,19 +38,29 @@ const App = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault()  // dont refresh page after form submit
-        const user = await loginService.login({username, password})
-        if (user) {
+        try {
+            const user = await loginService.login({username, password})
             window.localStorage.setItem('blogAppUser', JSON.stringify(user))
             blogService.setToken(user.token)
             setUser(user)
             setUsername('')
             setPassword('')
+            notify('Login successful')
+            console.log(user)
+        } catch (e){
+            notify(e, true)
         }
     }
 
     const handleLogOut = () => {
-        window.localStorage.removeItem('blogAppUser')
-        setUser(null)
+        try {
+            window.localStorage.removeItem('blogAppUser')
+            setUser(null)
+            notify('Logout successful')
+        }catch (e){
+            notify(e, true)
+        }
+
     }
 
     const handleNewBlogChange = (e) => {
@@ -52,37 +74,45 @@ const App = () => {
 
     const handleCreateBlog = async (e) => {
         e.preventDefault()
-        const blog = await blogService.createBlog(newBlog)
-        setBlogs(blogs.concat(blog))
-        setNewBlog({title: '', author: '', url: ''})
+        try {
+            const blog = await blogService.createBlog(newBlog)
+            setBlogs(blogs.concat(blog))
+            setNewBlog({title: '', author: '', url: ''})
+            notify('Created')
+        } catch (e){
+            notify(e, true)
+        }
     }
     return (
-        (user === null) ?
-            <div>
-                <h3>log in to application</h3>
-                <LoginForm
-                    handleLogin={handleLogin}
-                    username={username}
-                    password={password}
-                    setUserName={setUsername}
-                    setPassword={setPassword}
-                />
-            </div>
-            :
-            <div>
-                <h2>blogs</h2>
-                <p>{user.name} is logged in
-                    <button onClick={handleLogOut}>logout</button>
-                </p>
-                <BlogForm
-                    handleNewBlogChange={handleNewBlogChange}
-                    newBlog={newBlog}
-                    handleCreateBlog={handleCreateBlog}
-                />
-                {blogs.map(blog =>
-                    <Blog key={blog.id} blog={blog}/>
-                )}
-            </div>
+        <div>
+            <Notification {...notification}/>
+            {(user === null) ?
+                <div>
+                    <h3>log in to application</h3>
+                    <LoginForm
+                        handleLogin={handleLogin}
+                        username={username}
+                        password={password}
+                        setUserName={setUsername}
+                        setPassword={setPassword}
+                    />
+                </div>
+                :
+                <div>
+                    <h2>blogs</h2>
+                    <p>{user.name} is logged in
+                        <button onClick={handleLogOut}>logout</button>
+                    </p>
+                    <BlogForm
+                        handleNewBlogChange={handleNewBlogChange}
+                        newBlog={newBlog}
+                        handleCreateBlog={handleCreateBlog}
+                    />
+                    {blogs.map(blog =>
+                        <Blog key={blog.id} blog={blog}/>
+                    )}
+                </div>}
+        </div>
     )
 }
 
