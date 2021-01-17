@@ -17,12 +17,24 @@ const App = () => {
         )
     }, [])
 
+    const fetchUserFromStorage = ()=>{
+        const json_user = window.localStorage.getItem("blogAppUser")
+        setUser(JSON.parse(json_user))
+    }
+    useEffect(fetchUserFromStorage, [])  // dependencies [] - effect is executed only when the component is rendered for the first time
+
     const handleLogin = async (e)=>{
         e.preventDefault()  // dont refresh page after form submit
         const user = await loginService.login({username,password})
+        window.localStorage.setItem('blogAppUser', JSON.stringify(user))
         setUser(user)
         setUsername('')
         setPassword('')
+    }
+
+    const handleLogOut = ()=>{
+        window.localStorage.removeItem('blogAppUser')
+        setUser(null)
     }
 
     return (
@@ -40,7 +52,9 @@ const App = () => {
             :
             <div>
                 <h2>blogs</h2>
-                <p>{user.name} is logged in</p>
+                <p>{user.name} is logged in
+                    <button onClick={handleLogOut}>logout</button>
+                </p>
                 {blogs.map(blog =>
                     <Blog key={blog.id} blog={blog}/>
                 )}
