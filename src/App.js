@@ -12,7 +12,6 @@ const App = () => {
     const [user, setUser] = useState(null)
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [newBlog, setNewBlog] = useState({title: '', author: '', url: ''})
     const [notification, setNotification] = useState({message: '', isError: false})
     const newBlogRef = useRef(null)
 
@@ -20,10 +19,10 @@ const App = () => {
      * @param message is error if error is true, else just message
      * @param isError is true if notifies about error
      * */
-    const notify = (message, isError=false)=>{
+    const notify = (message, isError = false) => {
         console.log(message)
         setNotification({message, isError})
-        setTimeout(()=>setNotification({message: '', isError: false}), 5000)
+        setTimeout(() => setNotification({message: '', isError: false}), 5000)
     }
 
     useEffect(() => {
@@ -36,7 +35,7 @@ const App = () => {
         const json_user = window.localStorage.getItem("blogAppUser")
         const user = JSON.parse(json_user)
         setUser(user)
-        if (user && user.token){
+        if (user && user.token) {
             blogService.setToken(user.token)
         }
     }
@@ -53,7 +52,7 @@ const App = () => {
             setPassword('')
             notify('Login successful')
             console.log(user)
-        } catch (e){
+        } catch (e) {
             notify(e, true)
         }
     }
@@ -63,30 +62,19 @@ const App = () => {
             window.localStorage.removeItem('blogAppUser')
             setUser(null)
             notify('Logout successful')
-        }catch (e){
+        } catch (e) {
             notify(e, true)
         }
 
     }
 
-    const handleNewBlogChange = (e) => {
-        const creatingBlog = {
-            title: e.target.name === "title" ? e.target.value : newBlog.title,
-            author: e.target.name === "author" ? e.target.value : newBlog.author,
-            url: e.target.name === "url" ? e.target.value : newBlog.url,
-        }
-        setNewBlog(creatingBlog)
-    }
-
-    const handleCreateBlog = async (e) => {
-        e.preventDefault()
+    const handleCreateBlog = async (newBlog) => {
         try {
             const blog = await blogService.createBlog(newBlog)
             setBlogs(blogs.concat(blog))
-            setNewBlog({title: '', author: '', url: ''})
-            notify('Created')
+            notify(`Created: ${newBlog.title}`)
             newBlogRef.current.toggleVisibility()
-        } catch (e){
+        } catch (e) {
             notify(e, true)
         }
     }
@@ -110,13 +98,9 @@ const App = () => {
                     <p>{user.name} is logged in
                         <button onClick={handleLogOut}>logout</button>
                     </p>
-                        <Togglable buttonLabel={'new note'} ref={newBlogRef}>
-                            <BlogForm
-                                handleNewBlogChange={handleNewBlogChange}
-                                newBlog={newBlog}
-                                handleCreateBlog={handleCreateBlog}
-                            />
-                        </Togglable>
+                    <Togglable buttonLabel={'new blog'} ref={newBlogRef}>
+                        <BlogForm handleCreateBlog={handleCreateBlog}/>
+                    </Togglable>
                     {blogs.map(blog =>
                         <Blog key={blog.id} blog={blog}/>
                     )}
