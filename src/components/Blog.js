@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 
-const Blog = ({blog, handleUpdateBlog}) => {
+const Blog = ({blog, handleUpdateBlog, handleRemoveBlog}) => {
 
     const [showDetails, setShowDetails] = useState(false)
 
@@ -24,6 +24,11 @@ const Blog = ({blog, handleUpdateBlog}) => {
         handleUpdateBlog(blog)
     }
 
+    const removeBlog = (blog) => {
+        window.confirm(`delete ${blog.title} ?`)
+        handleRemoveBlog(blog)
+    }
+
     return (
         <div style={blogStyle}>
             <div>{blog.title} {blog.author}
@@ -40,6 +45,10 @@ const Blog = ({blog, handleUpdateBlog}) => {
                     </button>
                 </div>
                 <div>{blog.author}</div>
+                <button onClick={() => {
+                    removeBlog(blog)
+                }}>remove
+                </button>
             </div>
         </div>
     )

@@ -87,6 +87,22 @@ const App = () => {
             notify(e, true)
         }
     }
+
+    const handleRemoveBlog = async (blog)=>{
+        try {
+            const result = await blogService.removeBlog(blog)
+            if (result.status === 204 ) {
+                setBlogs(blogs.filter(b => b.id !== blog.id))
+                notify(`Deleted: ${blog.title}`)
+            } else{
+                notify(result)
+            }
+        } catch (e){
+            notify(e, true)
+        }
+    }
+
+
     return (
         <div>
             <Notification {...notification}/>
@@ -110,11 +126,14 @@ const App = () => {
                     <Togglable buttonLabel={'new blog'} ref={newBlogRef}>
                         <BlogForm handleCreateBlog={handleCreateBlog}/>
                     </Togglable>
-                    {blogs
-                        .sort((a, b) => b.likes - a.likes)
-                        .map(blog =>
-                            <Blog key={blog.id} blog={blog} handleUpdateBlog={handleUpdateBlog}/>
-                        )}
+                    {blogs.sort((a, b) => (b.likes - a.likes)).map(blog =>
+                        <Blog
+                            key={blog.id}
+                            blog={blog}
+                            handleUpdateBlog={handleUpdateBlog}
+                            handleRemoveBlog={handleRemoveBlog}
+                        />
+                    )}
                 </div>}
         </div>
     )

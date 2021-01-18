@@ -14,14 +14,19 @@ const getAll = () => {
 }
 
 const createBlog = async (blog) => {
-        const res = await axios.post(baseUrl, blog, {headers: {Authorization: token}})
-        return res.data
+    const res = await axios.post(baseUrl, blog, {headers: {Authorization: token}})
+    return res.data
 }
 
-const updateBlog = async(blog)=> {
+const updateBlog = async (blog) => {
     const res = await axios.put(`${baseUrl}/${blog.id}`, blog, {headers: {Authorization: token}})
     return res.data
 }
 
-const blogService = {getAll, createBlog, setToken, updateBlog}
+const removeBlog = async (blog) => {
+    const res = await axios.delete(`${baseUrl}/${blog.id}`, {headers: {Authorization: token}})
+    return res
+}
+
+const blogService = {getAll, createBlog, setToken, updateBlog, removeBlog}
 export default blogService
