@@ -78,6 +78,15 @@ const App = () => {
             notify(e, true)
         }
     }
+
+    const handleUpdateBlog = async (blog) => {
+        try {
+            const result = await blogService.updateBlog(blog)
+            setBlogs(blogs.map(b => b.id === result.id ? result : b))
+        } catch (e) {
+            notify(e, true)
+        }
+    }
     return (
         <div>
             <Notification {...notification}/>
@@ -102,7 +111,7 @@ const App = () => {
                         <BlogForm handleCreateBlog={handleCreateBlog}/>
                     </Togglable>
                     {blogs.map(blog =>
-                        <Blog key={blog.id} blog={blog}/>
+                        <Blog key={blog.id} blog={blog} handleUpdateBlog={handleUpdateBlog}/>
                     )}
                 </div>}
         </div>
