@@ -34,7 +34,7 @@ const App = () => {
         const json_user = window.localStorage.getItem("blogAppUser")
         const user = JSON.parse(json_user)
         setUser(user)
-        if (user.token){
+        if (user && user.token){
             blogService.setToken(user.token)
         }
     }
