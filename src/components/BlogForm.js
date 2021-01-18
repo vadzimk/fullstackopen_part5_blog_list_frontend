@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import blogService from "../services/blogs.js";
 
 const BlogForm = ({handleCreateBlog}) => {
-    const [newBlog, setNewBlog] = useState({title: '', author: '', url: ''})
+    const [newBlog, setNewBlog] = useState({title: '', author: '', url: '', likes: 0, user: ''})
 
     const handleNewBlogChange = (e) => {
         const creatingBlog = {
@@ -16,7 +16,7 @@ const BlogForm = ({handleCreateBlog}) => {
     const handleNewBlog = async (e) => {
         e.preventDefault()
         handleCreateBlog(newBlog)
-        setNewBlog({title: '', author: '', url: ''})
+        setNewBlog({title: '', author: '', url: '', likes: 0, user: ''})
     }
 
     return (
