@@ -32,7 +32,11 @@ const App = () => {
 
     const fetchUserFromStorage = () => {
         const json_user = window.localStorage.getItem("blogAppUser")
-        setUser(JSON.parse(json_user))
+        const user = JSON.parse(json_user)
+        setUser(user)
+        if (user.token){
+            blogService.setToken(user.token)
+        }
     }
     useEffect(fetchUserFromStorage, [])  // dependencies [] - effect is executed only when the component is rendered for the first time
 
