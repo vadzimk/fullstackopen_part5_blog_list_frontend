@@ -22,11 +22,20 @@ describe('Blog component', () => {
 
 
     test('url and likes displayed when button "view" is clicked', () => {
-        const component = render(<Blog blog={blog}/> )
+        const component = render(<Blog blog={blog}/>)
 
         const button = component.getByText('view')
         fireEvent.click(button)
         const details = component.container.querySelector('.details')
         expect(details).not.toHaveStyle('display: none')
+    })
+
+    test('like button invokes event handler', () => {
+        const eventHandlerMock = jest.fn()
+        const component = render(<Blog blog={blog} handleUpdateBlog={eventHandlerMock}/>)
+        const likeButton = component.getByText('like')
+        fireEvent.click(likeButton)
+        fireEvent.click(likeButton)
+        expect(eventHandlerMock.mock.calls).toHaveLength(2)
     })
 })
