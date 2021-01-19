@@ -36,7 +36,7 @@ const Blog = ({blog, handleUpdateBlog, handleRemoveBlog}) => {
                     setShowDetails(!showDetails)
                 }}>{showDetails ? 'hide' : 'view'}</button>
             </div>
-            <div style={detailsStyle}>
+            <div style={detailsStyle} className="details">
                 <div>{blog.url}</div>
                 <div>likes {blog.likes}
                     <button onClick={() => {
