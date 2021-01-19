@@ -5,8 +5,9 @@ import Blog from "./Blog.js";
 
 describe('Blog component', () => {
 
+    const blog = {title: 'test-title', author: 'test-author', url: 'http://127.0.0.1:3001', likes: 0, user: ''}
+
     test('renders title and author but not url or likes by default', () => {
-        const blog = {title: 'test-title', author: 'test-author', url: 'http://127.0.0.1:3001', likes: 0, user: ''}
         const component = render(<Blog blog={blog}/>)
         // component.debug()
         expect(component.container).toHaveTextContent('test-title')
@@ -17,7 +18,15 @@ describe('Blog component', () => {
         const details = component.container.querySelector('.details')
         expect(details).toHaveStyle('display: none')
 
+    })
 
 
+    test('url and likes displayed when button "view" is clicked', () => {
+        const component = render(<Blog blog={blog}/> )
+
+        const button = component.getByText('view')
+        fireEvent.click(button)
+        const details = component.container.querySelector('.details')
+        expect(details).not.toHaveStyle('display: none')
     })
 })
