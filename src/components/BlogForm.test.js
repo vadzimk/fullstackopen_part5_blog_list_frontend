@@ -12,7 +12,8 @@ describe('BlogForm component', () => {
         const component = render(<BlogForm handleCreateBlog={handleCreateBlogMock}/>)
 
         const form = component.container.querySelector('form')
-        const title = component.container.querySelector('#title')
+        // const title = component.container.querySelector('#title')
+        const title = component.container.querySelector('input[name=title]') //CSS [attribute=value] Selector
         const author = component.container.querySelector('#author')
 
         fireEvent.change(title, {target: {value: "test-title"}})
