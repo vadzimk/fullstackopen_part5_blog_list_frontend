@@ -4,7 +4,7 @@ describe('Blog app', function () {
 
         // create initial user
         const user = {name: 'testuser', username: 'testusername', password: '1233'}
-        cy.request('POST', 'http://127.0.0.1:3000/api/users', user)
+        cy.createUser(user)
 
         cy.visit('http://127.0.0.1:3000')
     })
@@ -66,6 +66,46 @@ describe('Blog app', function () {
 
                 cy.get('@theBlog').contains(`likes 1`)
 
+
+            })
+        })
+
+        describe('when user created a blog', function () {
+            beforeEach(function () {
+                // create a blog
+                cy.login({username: 'testusername', password: '1233'})
+                cy.createBlog({title: 'test title 1 from cypress', author: 'test author from cypress', url: 'http//'})
+            })
+
+            it('can delete it', function () {
+                // delete a blog
+                cy.contains('test title 1 from cypress').as('theTitle').find('button').contains('view').click()
+                cy.get('@theTitle').parent().find('.details').find('button').contains('remove').click()
+                cy.get('body', {timeout: 6000}).should('not.contain', 'test title 1 from cypress')
+
+            })
+
+
+            it.only('another user cannot delete the blog', function () {
+                // create another user
+                const user = {name: 'blahaaaaa', username: 'blahuser', password: 'secret'}
+                cy.createUser(user)
+                cy.login({username: user.username, password: user.password})
+                cy.visit('http://127.0.0.1:3000')
+
+                let theContent
+                const logContent = (element) => {
+                    console.log(element.text())
+                    theContent = element.text()
+                }
+                const removeBlog = () => {
+                    console.log(theContent)
+                    cy.get('body').should('contain', theContent)
+                    cy.get("body").should('contain', 'unauthorized deletion')
+                }
+
+                // delete first blog
+                cy.contains('view').click().parent().then(logContent).parent().contains('remove').click().then(removeBlog)
 
             })
         })
