@@ -1,3 +1,5 @@
+import login from "../../src/services/login.js";
+
 describe('Blog app', function () {
     beforeEach(function () {
         cy.request('POST', 'http://127.0.0.1:3001/api/testing/reset')
@@ -86,7 +88,7 @@ describe('Blog app', function () {
             })
 
 
-            it.only('another user cannot delete the blog', function () {
+            it('another user cannot delete the blog', function () {
                 // create another user
                 const user = {name: 'blahaaaaa', username: 'blahuser', password: 'secret'}
                 cy.createUser(user)
@@ -95,11 +97,9 @@ describe('Blog app', function () {
 
                 let theContent
                 const logContent = (element) => {
-                    console.log(element.text())
                     theContent = element.text()
                 }
                 const removeBlog = () => {
-                    console.log(theContent)
                     cy.get('body').should('contain', theContent)
                     cy.get("body").should('contain', 'unauthorized deletion')
                 }
@@ -109,6 +109,51 @@ describe('Blog app', function () {
 
             })
         })
+
+        describe('when many blogs are created', function () {
+
+            // beforeEach(function () {
+            //
+            //     const user = {name: 'blahaaaaa', username: 'blahuser', password: 'secret'}
+            //     cy.createUser(user)
+            //     cy.login({username: user.username, password: user.password})
+            // })
+
+            it('blogs are sorted by the number of likes in descending order', function () {
+                // create many blogs
+                let likesArray = []
+                for (let i = 0; i < 10; i++) {
+                    let numLikes = Math.floor(Math.random() * 100)
+                    likesArray.push(numLikes)
+                    cy.createBlog({
+                        title: `test title ${i + 1} from cypress`,
+                        author: 'test author from cypress',
+                        url: 'http//',
+                        likes: numLikes
+                    })
+                } // endfor
+
+                let numberLikes
+                let likesArrayRendered = []
+                const grabContent=(e)=>{
+                    numberLikes = e.text().split(' ')[1]
+                    likesArrayRendered.push(numberLikes)
+                }
+                const output = (element, i) => {
+                    cy.wrap(element).click().parent().parent().find("span").contains('likes').then(grabContent)
+                }
+
+                const compare = ()=>{
+                    expect(likesArray.sort((a, b)=>b-a))
+                        .to.deep.eq(likesArrayRendered.map((value)=>Number(value)))
+                }
+
+                // uses jquery selectors
+                cy.get('body').find('.blog').find('button').filter(":contains('view')").each(output).then(compare)
+
+            })
+        })
+
     })
 
 
