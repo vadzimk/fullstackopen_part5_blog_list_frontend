@@ -1,15 +1,15 @@
-describe('Blog app', function (){
-    beforeEach(function (){
+describe('Blog app', function () {
+    beforeEach(function () {
         cy.request('POST', 'http://127.0.0.1:3001/api/testing/reset')
 
         // create initial user
-        const user = {name: 'testuser', username: 'testusername', password:'1233'}
+        const user = {name: 'testuser', username: 'testusername', password: '1233'}
         cy.request('POST', 'http://127.0.0.1:3000/api/users', user)
 
         cy.visit('http://127.0.0.1:3000')
     })
 
-    it('Login form is shown', function (){
+    it('Login form is shown', function () {
         cy.contains('login')
     })
 
@@ -37,7 +37,7 @@ describe('Blog app', function (){
             cy.login({username: 'testusername', password: '1233'})
         })
 
-        it.only('a blog can be created', function () {
+        it('a blog can be created', function () {
             // create blog
             cy.contains('new blog').click()
             cy.get('input[name=title]').type('title from cypress')
@@ -47,5 +47,29 @@ describe('Blog app', function (){
             cy.contains('title from cypress author from cypress')
 
         })
+
+        describe('When several blogs exists', function () {
+            beforeEach(function () {
+                cy.login({username: 'testusername', password: '1233'})
+                cy.createBlog({title: 'test title 1 from cypress', author: 'test author from cypress', url: 'http//'})
+                cy.createBlog({title: 'test title 2 from cypress', author: 'test author from cypress', url: 'http//'})
+                cy.createBlog({title: 'test title 3 from cypress', author: 'test author from cypress', url: 'http//'})
+            })
+
+            it('user can like a blog', function () {
+                // like a blog
+                cy.contains('test title 2 from cypress').as('theTitle')
+                    .contains('view').click()
+
+                // to look at descendent dom elements use .find()
+                cy.get('@theTitle').parent().as('theBlog').find('button').contains('like').click()
+
+                cy.get('@theBlog').contains(`likes 1`)
+
+
+            })
+        })
     })
+
+
 })

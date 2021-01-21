@@ -30,7 +30,20 @@ Cypress.Commands.add('login', ({username, password})=>{
         .then(({body})=>{
             localStorage.setItem('blogAppUser', JSON.stringify(body))
             cy.visit('http://127.0.0.1:3000')
-            debugger
         })
 })
 
+
+Cypress.Commands.add('createBlog', ({title, author, url})=>{
+    cy.request(
+        {
+            url: 'http://127.0.0.1:3001/api/blogs',
+            method: 'POST',
+            body: {title, author, url},
+            headers: {
+                'Authorization': `bearer ${JSON.parse(localStorage.getItem('blogAppUser')).token}`
+            }
+        }
+    )
+    cy.visit('http://127.0.0.1:3000')
+})
